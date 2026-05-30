@@ -1,0 +1,1868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Next.js Reference — Full Course</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* =====================================================
+   RESET & TOKENS
+===================================================== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --ink:       #0f0f0f;
+  --ink2:      #3a3a3a;
+  --ink3:      #777;
+  --ink4:      #aaa;
+  --paper:     #fafaf8;
+  --surface:   #f2f1ec;
+  --rule:      #e0dfd8;
+  --rule2:     #cccac0;
+  --accent:    #1a6ef5;
+  --accent-bg: #edf2fe;
+  --green:     #0e7a4e;
+  --green-bg:  #e6f5ee;
+  --amber:     #92520a;
+  --amber-bg:  #fdf3e3;
+  --red:       #c0291d;
+  --red-bg:    #fdecea;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'IBM Plex Sans', sans-serif;
+  --sidebar-w: 256px;
+  --content-max: 780px;
+}
+
+html { scroll-behavior: smooth; font-size: 15px; }
+
+body {
+  font-family: var(--sans);
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.75;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code {
+  font-family: var(--mono);
+  font-size: 0.82em;
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: 3px;
+  padding: 1px 5px;
+}
+
+/* =====================================================
+   LAYOUT
+===================================================== */
+.layout { display: flex; min-height: 100vh; }
+
+/* ---- Sidebar ---- */
+.sidebar {
+  width: var(--sidebar-w);
+  min-width: var(--sidebar-w);
+  background: var(--surface);
+  border-right: 1px solid var(--rule2);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-brand {
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid var(--rule2);
+}
+
+.sidebar-brand-title {
+  font-family: var(--mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+}
+
+.sidebar-brand-sub {
+  font-size: 11px;
+  color: var(--ink3);
+  margin-top: 2px;
+}
+
+.sidebar-search {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.sidebar-search input {
+  width: 100%;
+  padding: 6px 10px;
+  border: 1px solid var(--rule2);
+  border-radius: 4px;
+  background: var(--paper);
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--ink);
+  outline: none;
+}
+
+.sidebar-search input:focus { border-color: var(--accent); }
+
+.nav-chapter {
+  padding: 14px 0 6px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.nav-chapter:last-child { border-bottom: none; }
+
+.nav-chapter-label {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink4);
+  padding: 0 18px 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 18px;
+  font-size: 12.5px;
+  color: var(--ink2);
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+  border-left: 2px solid transparent;
+  text-decoration: none;
+}
+
+.nav-item:hover {
+  background: var(--rule);
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.nav-item.active {
+  border-left-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.nav-item .tag {
+  font-family: var(--mono);
+  font-size: 9px;
+  padding: 1px 5px;
+  border-radius: 3px;
+  font-weight: 600;
+  margin-left: auto;
+}
+
+.tag-js    { background: #fef3c7; color: #92520a; }
+.tag-next  { background: #e0e7ff; color: #3730a3; }
+.tag-be    { background: #d1fae5; color: #065f46; }
+.tag-vibe  { background: #fce7f3; color: #9d174d; }
+
+/* ---- Main content ---- */
+.main {
+  flex: 1;
+  min-width: 0;
+  padding: 0 48px 120px;
+}
+
+.content-inner {
+  max-width: var(--content-max);
+  margin: 0 auto;
+}
+
+/* =====================================================
+   HERO
+===================================================== */
+.hero {
+  padding: 56px 0 40px;
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 0;
+}
+
+.hero-eyebrow {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 10px;
+}
+
+.hero h1 {
+  font-size: 36px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  line-height: 1.1;
+  margin-bottom: 14px;
+}
+
+.hero-desc {
+  font-size: 16px;
+  color: var(--ink2);
+  max-width: 540px;
+  line-height: 1.7;
+  margin-bottom: 20px;
+}
+
+.hero-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.chip {
+  font-family: var(--mono);
+  font-size: 11px;
+  padding: 4px 10px;
+  border: 1px solid var(--rule2);
+  border-radius: 20px;
+  color: var(--ink3);
+  background: var(--paper);
+}
+
+/* =====================================================
+   SECTION STRUCTURE
+===================================================== */
+.chapter-divider {
+  padding: 48px 0 0;
+}
+
+.chapter-number {
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink4);
+  margin-bottom: 4px;
+}
+
+.chapter-title {
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin-bottom: 10px;
+}
+
+.chapter-intro {
+  font-size: 14.5px;
+  color: var(--ink2);
+  line-height: 1.8;
+  max-width: 620px;
+  padding-bottom: 28px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.section {
+  padding: 36px 0 0;
+  scroll-margin-top: 20px;
+}
+
+.section-title {
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-badge {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 3px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.body-text {
+  font-size: 14px;
+  color: var(--ink2);
+  line-height: 1.85;
+  margin-bottom: 14px;
+}
+
+/* =====================================================
+   CODE BLOCKS
+===================================================== */
+.code-wrap {
+  margin: 14px 0;
+  border: 1px solid var(--rule2);
+  border-radius: 6px;
+  overflow: hidden;
+  font-family: var(--mono);
+}
+
+.code-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 14px;
+  background: #1c1c1e;
+  border-bottom: 1px solid #333;
+}
+
+.code-file { font-size: 11px; color: #888; }
+.code-lang { font-size: 10px; font-weight: 600; letter-spacing: 0.06em; color: #5dc8a4; text-transform: uppercase; }
+
+.code-copy {
+  font-size: 10px;
+  padding: 3px 8px;
+  border: 1px solid #444;
+  border-radius: 3px;
+  background: none;
+  color: #888;
+  cursor: pointer;
+  font-family: var(--mono);
+  transition: color 0.15s, border-color 0.15s;
+}
+.code-copy:hover { color: #ccc; border-color: #666; }
+
+pre.code-body {
+  background: #141416;
+  padding: 16px 18px;
+  overflow-x: auto;
+  font-size: 12.5px;
+  line-height: 1.7;
+  color: #cdd6f4;
+}
+
+/* syntax */
+.kw  { color: #cba6f7; }
+.str { color: #a6e3a1; }
+.fn  { color: #89b4fa; }
+.cm  { color: #555770; font-style: italic; }
+.vr  { color: #f38ba8; }
+.op  { color: #fab387; }
+.nm  { color: #f9e2af; }
+.pu  { color: #cdd6f4; }
+
+/* =====================================================
+   CALLOUTS
+===================================================== */
+.callout {
+  border-radius: 5px;
+  padding: 13px 16px;
+  margin: 14px 0;
+  font-size: 13.5px;
+  line-height: 1.7;
+  border-left: 3px solid;
+}
+.callout strong { display: block; margin-bottom: 2px; font-size: 12px; letter-spacing: 0.03em; text-transform: uppercase; font-family: var(--mono); }
+.callout-info   { background: var(--accent-bg); border-color: var(--accent); color: #1e3a6e; }
+.callout-info strong { color: var(--accent); }
+.callout-tip    { background: var(--green-bg); border-color: var(--green); color: #0a3d27; }
+.callout-tip strong { color: var(--green); }
+.callout-warn   { background: var(--amber-bg); border-color: var(--amber); color: #4a2800; }
+.callout-warn strong { color: var(--amber); }
+
+/* =====================================================
+   FILE TREE
+===================================================== */
+.file-tree {
+  background: #141416;
+  border: 1px solid var(--rule2);
+  border-radius: 6px;
+  padding: 14px 18px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 2;
+  color: #cdd6f4;
+  margin: 14px 0;
+}
+.ft-dir  { color: #89b4fa; }
+.ft-file { color: #cdd6f4; }
+.ft-url  { color: #a6e3a1; }
+.ft-note { color: #555770; font-style: italic; margin-left: 10px; }
+
+/* =====================================================
+   COMPARISON TABLE
+===================================================== */
+.compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 14px 0;
+}
+.compare-box {
+  border: 1px solid var(--rule2);
+  border-radius: 5px;
+  padding: 14px;
+}
+.compare-box h4 {
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+}
+.compare-box ul { padding-left: 16px; font-size: 13px; color: var(--ink2); line-height: 2; }
+.compare-good { border-color: #86efac; }
+.compare-good h4 { color: var(--green); }
+.compare-bad  { border-color: #fca5a5; }
+.compare-bad h4  { color: var(--red); }
+
+/* =====================================================
+   LIVE DEMOS
+===================================================== */
+.demo-wrap {
+  border: 1px solid var(--rule2);
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 14px 0;
+}
+.demo-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--rule);
+}
+.demo-label { font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--ink3); }
+.demo-live  { font-family: var(--mono); font-size: 10px; color: var(--green); }
+.demo-body  { padding: 18px; background: var(--paper); }
+
+/* demo elements */
+.d-btn {
+  padding: 7px 14px;
+  border: 1px solid var(--rule2);
+  border-radius: 4px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+.d-btn:hover { background: var(--surface); border-color: var(--rule2); }
+.d-btn.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+.d-btn.primary:hover { background: #1558d0; }
+.d-btn.danger { background: var(--red-bg); color: var(--red); border-color: #fca5a5; }
+
+.d-input {
+  padding: 7px 12px;
+  border: 1px solid var(--rule2);
+  border-radius: 4px;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--mono);
+  font-size: 12px;
+  outline: none;
+  width: 100%;
+  transition: border-color 0.12s;
+}
+.d-input:focus { border-color: var(--accent); }
+
+.d-output {
+  background: #141416;
+  border: 1px solid var(--rule2);
+  border-radius: 4px;
+  padding: 12px 14px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: #a6e3a1;
+  min-height: 40px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  margin-top: 10px;
+}
+
+.d-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.d-gap { margin-bottom: 10px; }
+
+/* =====================================================
+   STEP LIST
+===================================================== */
+.steps { margin: 14px 0; }
+.step  { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 14px; }
+.step-n {
+  width: 24px; height: 24px; border-radius: 50%; flex-shrink: 0;
+  background: var(--accent-bg); border: 1px solid var(--accent);
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--mono); font-size: 11px; font-weight: 600; color: var(--accent);
+}
+.step-body { font-size: 13.5px; color: var(--ink2); line-height: 1.75; padding-top: 2px; }
+
+/* =====================================================
+   HTTP METHOD PILLS
+===================================================== */
+.method-get    { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--green); background: var(--green-bg); padding: 2px 7px; border-radius: 3px; }
+.method-post   { font-family: var(--mono); font-size: 11px; font-weight: 700; color: #3730a3; background: #e0e7ff; padding: 2px 7px; border-radius: 3px; }
+.method-delete { font-family: var(--mono); font-size: 11px; font-weight: 700; color: var(--red); background: var(--red-bg); padding: 2px 7px; border-radius: 3px; }
+
+/* =====================================================
+   QUIZ
+===================================================== */
+.quiz-options { margin: 10px 0; }
+.q-opt {
+  display: block; width: 100%;
+  text-align: left;
+  padding: 9px 14px;
+  background: var(--paper);
+  border: 1px solid var(--rule2);
+  border-radius: 4px;
+  margin-bottom: 6px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  color: var(--ink2);
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+}
+.q-opt:hover:not(:disabled) { border-color: var(--accent); color: var(--ink); background: var(--accent-bg); }
+.q-opt.correct { background: var(--green-bg); border-color: var(--green); color: #0a3d27; }
+.q-opt.wrong   { background: var(--red-bg); border-color: #fca5a5; color: var(--red); }
+
+/* =====================================================
+   PROMPT CARDS (vibe coding)
+===================================================== */
+.prompt-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
+.prompt-box { border-radius: 5px; padding: 14px; }
+.prompt-bad  { background: var(--red-bg); border: 1px solid #fca5a5; }
+.prompt-good { background: var(--green-bg); border: 1px solid #86efac; }
+.prompt-box h4 { font-family: var(--mono); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 8px; }
+.prompt-bad h4 { color: var(--red); }
+.prompt-good h4 { color: var(--green); }
+.prompt-box p { font-family: var(--mono); font-size: 12px; line-height: 1.7; white-space: pre-wrap; }
+.prompt-bad p { color: #7f1d1d; }
+.prompt-good p { color: #0a3d27; }
+
+/* =====================================================
+   SCROLLBAR
+===================================================== */
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--rule2); border-radius: 2px; }
+
+/* =====================================================
+   TOPBAR (mobile)
+===================================================== */
+.topbar-mobile { display: none; }
+
+@media (max-width: 860px) {
+  .sidebar { display: none; }
+  .main { padding: 0 20px 80px; }
+  .topbar-mobile {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 20px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--rule2);
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .prompt-pair, .compare { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+<!-- =====================================================
+     SIDEBAR
+===================================================== -->
+<nav class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <div class="sidebar-brand-title">next.js / reference</div>
+    <div class="sidebar-brand-sub">Full course · Middle School</div>
+  </div>
+  <div class="sidebar-search">
+    <input type="text" placeholder="Search sections..." id="search-input" oninput="filterNav(this.value)">
+  </div>
+
+  <div class="nav-chapter" id="nav-group-intro">
+    <div class="nav-chapter-label">Getting started</div>
+    <a class="nav-item" href="#intro">Overview</a>
+    <a class="nav-item" href="#how-nextjs-works">How Next.js works</a>
+  </div>
+
+  <div class="nav-chapter" id="nav-group-js">
+    <div class="nav-chapter-label">01 — JavaScript</div>
+    <a class="nav-item" href="#js-map">map() &amp; filter() <span class="tag tag-js">JS</span></a>
+    <a class="nav-item" href="#js-destructure">Destructuring &amp; spread <span class="tag tag-js">JS</span></a>
+    <a class="nav-item" href="#js-async">async / await &amp; fetch <span class="tag tag-js">JS</span></a>
+    <a class="nav-item" href="#js-optional">Optional chaining (?.) <span class="tag tag-js">JS</span></a>
+  </div>
+
+  <div class="nav-chapter" id="nav-group-pages">
+    <div class="nav-chapter-label">02 — Pages &amp; Routing</div>
+    <a class="nav-item" href="#pages-app-router">App Router basics <span class="tag tag-next">Next</span></a>
+    <a class="nav-item" href="#pages-link">Link &amp; navigation <span class="tag tag-next">Next</span></a>
+    <a class="nav-item" href="#pages-dynamic">Dynamic routes [slug] <span class="tag tag-next">Next</span></a>
+    <a class="nav-item" href="#pages-layout">layout.tsx <span class="tag tag-next">Next</span></a>
+  </div>
+
+  <div class="nav-chapter" id="nav-group-events">
+    <div class="nav-chapter-label">03 — Events &amp; State</div>
+    <a class="nav-item" href="#events-client">Server vs Client <span class="tag tag-next">Next</span></a>
+    <a class="nav-item" href="#events-usestate">useState <span class="tag tag-js">JS</span></a>
+    <a class="nav-item" href="#events-onclick">onClick &amp; events <span class="tag tag-js">JS</span></a>
+    <a class="nav-item" href="#events-forms">Forms &amp; onChange <span class="tag tag-js">JS</span></a>
+    <a class="nav-item" href="#events-useeffect">useEffect <span class="tag tag-js">JS</span></a>
+    <a class="nav-item" href="#events-lists">Rendering lists <span class="tag tag-js">JS</span></a>
+  </div>
+
+  <div class="nav-chapter" id="nav-group-backend">
+    <div class="nav-chapter-label">04 — Backend</div>
+    <a class="nav-item" href="#be-how">How the web works <span class="tag tag-be">BE</span></a>
+    <a class="nav-item" href="#be-route-handlers">Route Handlers <span class="tag tag-be">BE</span></a>
+    <a class="nav-item" href="#be-server-actions">Server Actions <span class="tag tag-be">BE</span></a>
+    <a class="nav-item" href="#be-env">Environment variables <span class="tag tag-be">BE</span></a>
+    <a class="nav-item" href="#be-supabase">Supabase setup <span class="tag tag-be">BE</span></a>
+    <a class="nav-item" href="#be-crud">CRUD operations <span class="tag tag-be">BE</span></a>
+  </div>
+
+  <div class="nav-chapter" id="nav-group-vibe">
+    <div class="nav-chapter-label">05 — Vibe Coding</div>
+    <a class="nav-item" href="#vibe-what">What is Cursor? <span class="tag tag-vibe">AI</span></a>
+    <a class="nav-item" href="#vibe-prompts">Prompt formula <span class="tag tag-vibe">AI</span></a>
+    <a class="nav-item" href="#vibe-examples">Good vs bad prompts <span class="tag tag-vibe">AI</span></a>
+    <a class="nav-item" href="#vibe-workflow">Workflow <span class="tag tag-vibe">AI</span></a>
+  </div>
+</nav>
+
+<!-- =====================================================
+     MAIN CONTENT
+===================================================== -->
+<main class="main">
+<div class="topbar-mobile">
+  <span>next.js / reference</span>
+</div>
+
+<div class="content-inner">
+
+<!-- HERO -->
+<section class="hero" id="intro">
+  <div class="hero-eyebrow">Full Course Reference</div>
+  <h1>Next.js</h1>
+  <p class="hero-desc">
+    Everything you need to build real full-stack web apps —
+    JavaScript fundamentals, routing, events, backend, and AI-assisted coding.
+    Use this as a reference during and after class.
+  </p>
+  <div class="hero-chips">
+    <span class="chip">Next.js 14</span>
+    <span class="chip">App Router</span>
+    <span class="chip">TypeScript</span>
+    <span class="chip">Supabase</span>
+    <span class="chip">Cursor</span>
+  </div>
+</section>
+
+<!-- How Next.js works -->
+<section class="section" id="how-nextjs-works">
+  <h2 class="section-title">How Next.js works</h2>
+  <p class="body-text">Next.js is a <strong>React framework</strong> — it gives you React plus routing, a backend, image optimization, and more, all in one project. You don't need a separate server.</p>
+
+  <div class="file-tree">
+<span class="ft-dir">my-app/</span>
+├── <span class="ft-dir">src/app/</span>            <span class="ft-note">← all your pages live here</span>
+│   ├── <span class="ft-file">page.tsx</span>         <span class="ft-url">→ yoursite.com/</span>
+│   ├── <span class="ft-file">layout.tsx</span>       <span class="ft-note">← wraps every page (navbar, fonts)</span>
+│   ├── <span class="ft-dir">about/</span>
+│   │   └── <span class="ft-file">page.tsx</span>     <span class="ft-url">→ yoursite.com/about</span>
+│   ├── <span class="ft-dir">blog/</span>
+│   │   ├── <span class="ft-file">page.tsx</span>     <span class="ft-url">→ yoursite.com/blog</span>
+│   │   └── <span class="ft-dir">[slug]/</span>
+│   │       └── <span class="ft-file">page.tsx</span> <span class="ft-url">→ yoursite.com/blog/any-post</span>
+│   └── <span class="ft-dir">api/</span>
+│       └── <span class="ft-dir">posts/</span>
+│           └── <span class="ft-file">route.ts</span> <span class="ft-url">→ yoursite.com/api/posts</span>
+└── <span class="ft-dir">public/</span>              <span class="ft-note">← images, fonts, static files</span>
+  </div>
+
+  <div class="callout callout-tip">
+    <strong>Key rule</strong>
+    Only files named exactly <code>page.tsx</code> become visible pages. Any other filename is just a helper file.
+  </div>
+</section>
+
+
+<!-- =====================================================
+     CHAPTER 1 — JAVASCRIPT
+===================================================== -->
+<div class="chapter-divider" id="ch-js">
+  <div class="chapter-number">Chapter 01</div>
+  <h2 class="chapter-title">JavaScript Fundamentals</h2>
+  <p class="chapter-intro">
+    Before diving into React/Next.js, you need these JS patterns — you'll use them every single day.
+    They show up constantly in component code.
+  </p>
+</div>
+
+<!-- map & filter -->
+<section class="section" id="js-map">
+  <h3 class="section-title">map() &amp; filter() <span class="section-badge tag-js">JS</span></h3>
+  <p class="body-text"><code>map()</code> transforms every item in an array and returns a new array. <code>filter()</code> keeps only the items that pass a test.</p>
+
+  <div class="code-wrap">
+    <div class="code-bar"><span class="code-file">arrays.js</span><span class="code-lang">JavaScript</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+    <pre class="code-body"><span class="kw">const</span> <span class="vr">nums</span> <span class="pu">=</span> [<span class="nm">1</span>, <span class="nm">2</span>, <span class="nm">3</span>, <span class="nm">4</span>, <span class="nm">5</span>]
+
+<span class="cm">// map — transform each item</span>
+<span class="kw">const</span> <span class="vr">doubled</span> <span class="pu">=</span> <span class="vr">nums</span><span class="pu">.</span><span class="fn">map</span><span class="pu">(</span><span class="vr">n</span> <span class="pu">=></span> <span class="vr">n</span> <span class="pu">*</span> <span class="nm">2</span><span class="pu">)</span>
+<span class="cm">// [2, 4, 6, 8, 10]</span>
+
+<span class="cm">// filter — keep items that pass the test</span>
+<span class="kw">const</span> <span class="vr">evens</span> <span class="pu">=</span> <span class="vr">nums</span><span class="pu">.</span><span class="fn">filter</span><span class="pu">(</span><span class="vr">n</span> <span class="pu">=></span> <span class="vr">n</span> <span class="pu">%</span> <span class="nm">2</span> <span class="pu">===</span> <span class="nm">0</span><span class="pu">)</span>
+<span class="cm">// [2, 4]</span>
+
+<span class="cm">// chain them together</span>
+<span class="kw">const</span> <span class="vr">result</span> <span class="pu">=</span> <span class="vr">nums</span>
+  <span class="pu">.</span><span class="fn">filter</span><span class="pu">(</span><span class="vr">n</span> <span class="pu">=></span> <span class="vr">n</span> <span class="pu">></span> <span class="nm">2</span><span class="pu">)</span>           <span class="cm">// keep [3, 4, 5]</span>
+  <span class="pu">.</span><span class="fn">map</span><span class="pu">(</span><span class="vr">n</span> <span class="pu">=></span> <span class="vr">n</span> <span class="pu">*</span> <span class="nm">10</span><span class="pu">)</span>            <span class="cm">// double → [30, 40, 50]</span></pre>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-bar"><span class="code-file">page.tsx</span><span class="code-lang">React / Next.js</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+    <pre class="code-body"><span class="cm">// In React, map() renders lists of JSX elements</span>
+<span class="kw">const</span> <span class="vr">posts</span> <span class="pu">=</span> [
+  <span class="pu">{</span> <span class="vr">id</span><span class="pu">:</span> <span class="nm">1</span><span class="pu">,</span> <span class="vr">title</span><span class="pu">:</span> <span class="str">'Hello World'</span> <span class="pu">},</span>
+  <span class="pu">{</span> <span class="vr">id</span><span class="pu">:</span> <span class="nm">2</span><span class="pu">,</span> <span class="vr">title</span><span class="pu">:</span> <span class="str">'Learning Next.js'</span> <span class="pu">},</span>
+<span class="pu">]</span>
+
+<span class="kw">export default function</span> <span class="fn">Page</span><span class="pu">() {</span>
+  <span class="kw">return</span> <span class="pu">(</span>
+    <span class="op">&lt;ul&gt;</span>
+      <span class="pu">{</span><span class="vr">posts</span><span class="pu">.</span><span class="fn">map</span><span class="pu">((</span><span class="vr">post</span><span class="pu">) =></span> <span class="pu">(</span>
+        <span class="op">&lt;li</span> <span class="fn">key</span><span class="pu">={</span><span class="vr">post</span><span class="pu">.</span><span class="vr">id</span><span class="pu">}&gt;{</span><span class="vr">post</span><span class="pu">.</span><span class="vr">title</span><span class="pu">}&lt;/</span><span class="op">li</span><span class="pu">&gt;</span>
+      <span class="pu">))}</span>
+    <span class="op">&lt;/ul&gt;</span>
+  <span class="pu">)</span>
+<span class="pu">}</span></pre>
+  </div>
+
+  <div class="demo-wrap">
+    <div class="demo-bar"><span class="demo-label">Live demo — map() &amp; filter()</span><span class="demo-live">● interactive</span></div>
+    <div class="demo-body">
+      <div class="d-row d-gap">
+        <input class="d-input" id="map-input" placeholder="Type comma-separated words, e.g: pizza, sushi, tacos" oninput="runMap()" style="flex:1">
+      </div>
+      <div class="d-row" style="gap:16px; align-items:flex-start">
+        <div style="flex:1">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--ink4);margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em">.map(x => x.toUpperCase())</div>
+          <div class="d-output" id="map-out">—</div>
+        </div>
+        <div style="flex:1">
+          <div style="font-family:var(--mono);font-size:10px;color:var(--ink4);margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em">.filter(x => x.length > 4)</div>
+          <div class="d-output" id="filter-out">—</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Destructuring & spread -->
+<section class="section" id="js-destructure">
+  <h3 class="section-title">Destructuring &amp; spread (...) <span class="section-badge tag-js">JS</span></h3>
+  <p class="body-text">Destructuring unpacks values from objects/arrays. The spread operator <code>...</code> copies everything — used constantly when updating React state.</p>
+
+  <div class="code-wrap">
+    <div class="code-bar"><span class="code-file">destructure.js</span><span class="code-lang">JavaScript</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+    <pre class="code-body"><span class="cm">// Object destructuring</span>
+<span class="kw">const</span> <span class="vr">user</span> <span class="pu">=</span> <span class="pu">{</span> <span class="vr">name</span><span class="pu">:</span> <span class="str">'Alex'</span><span class="pu">,</span> <span class="vr">age</span><span class="pu">:</span> <span class="nm">14</span><span class="pu">,</span> <span class="vr">city</span><span class="pu">:</span> <span class="str">'Seoul'</span> <span class="pu">}</span>
+<span class="kw">const</span> <span class="pu">{</span> <span class="vr">name</span><span class="pu">,</span> <span class="vr">age</span> <span class="pu">}</span> <span class="pu">=</span> <span class="vr">user</span>   <span class="cm">// name='Alex', age=14</span>
+
+<span class="cm">// Array destructuring (useState uses this!)</span>
+<span class="kw">const</span> <span class="pu">[</span><span class="vr">count</span><span class="pu">,</span> <span class="vr">setCount</span><span class="pu">]</span> <span class="pu">=</span> <span class="fn">useState</span><span class="pu">(</span><span class="nm">0</span><span class="pu">)</span>
+
+<span class="cm">// Spread — copy an object and add/change fields</span>
+<span class="kw">const</span> <span class="vr">updated</span> <span class="pu">=</span> <span class="pu">{</span> <span class="pu">...</span><span class="vr">user</span><span class="pu">,</span> <span class="vr">age</span><span class="pu">:</span> <span class="nm">15</span> <span class="pu">}</span>
+<span class="cm">// { name: 'Alex', age: 15, city: 'Seoul' }</span>
+
+<span class="cm">// Spread array</span>
+<span class="kw">const</span> <span class="vr">newList</span> <span class="pu">=</span> <span class="pu">[...</span><span class="vr">oldList</span><span class="pu">,</span> <span class="str">'new item'</span><span class="pu">]</span>
+
+<span class="cm">// In React — updating one field of state</span>
+<span class="fn">setUser</span><span class="pu">(</span><span class="vr">prev</span> <span class="pu">=></span> <span class="pu">({</span> <span class="pu">...</span><span class="vr">prev</span><span class="pu">,</span> <span class="vr">age</span><span class="pu">:</span> <span class="nm">15</span> <span class="pu">}))</span></pre>
+  </div>
+
+  <div class="callout callout-tip">
+    <strong>React pattern</strong>
+    In components, destructure props directly: <code>function Card({ title, desc }) {'{'}...{'}'}</code> — cleaner than <code>props.title</code>, <code>props.desc</code>.
+  </div>
+</section>
+
+<!-- async / await -->
+<section class="section" id="js-async">
+  <h3 class="section-title">async / await &amp; fetch() <span class="section-badge tag-js">JS</span></h3>
+  <p class="body-text">Network requests take time. <code>async/await</code> lets you wait for them without freezing the page. <code>fetch()</code> is how you call APIs.</p>
+
+  <div class="code-wrap">
+    <div class="code-bar"><span class="code-file">fetch-example.ts</span><span class="code-lang">TypeScript</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+    <pre class="code-body"><span class="cm">// async = "this function will do something that takes time"</span>
+<span class="cm">// await = "wait here until this is done, then continue"</span>
+<span class="kw">async function</span> <span class="fn">loadPosts</span><span class="pu">() {</span>
+  <span class="kw">const</span> <span class="vr">res</span>  <span class="pu">=</span> <span class="kw">await</span> <span class="fn">fetch</span><span class="pu">(</span><span class="str">'/api/posts'</span><span class="pu">)</span>    <span class="cm">// wait for response</span>
+  <span class="kw">const</span> <span class="vr">data</span> <span class="pu">=</span> <span class="kw">await</span> <span class="vr">res</span><span class="pu">.</span><span class="fn">json</span><span class="pu">()</span>              <span class="cm">// wait for parsing</span>
+  <span class="kw">return</span> <span class="vr">data</span>
+<span class="pu">}</span>
+
+<span class="cm">// Always wrap in try/catch to handle errors</span>
+<span class="kw">async function</span> <span class="fn">safeLoad</span><span class="pu">() {</span>
+  <span class="kw">try</span> <span class="pu">{</span>
+    <span class="kw">const</span> <span class="vr">data</span> <span class="pu">=</span> <span class="kw">await</span> <span class="fn">loadPosts</span><span class="pu">()</span>
+    <span class="fn">setPosts</span><span class="pu">(</span><span class="vr">data</span><span class="pu">)</span>
+  <span class="pu">}</span> <span class="kw">catch</span> <span class="pu">(</span><span class="vr">err</span><span class="pu">) {</span>
+    <span class="fn">setError</span><span class="pu">(</span><span class="str">'Failed to load'</span><span class="pu">)</span>
+  <span class="pu">}</span>
+<span class="pu">}</span>
+
+<span class="cm">// Next.js Server Component — fetch directly in component</span>
+<span class="kw">export default async function</span> <span class="fn">Page</span><span class="pu">() {</span>
+  <span class="kw">const</span> <span class="vr">res</span>   <span class="pu">=</span> <span class="kw">await</span> <span class="fn">fetch</span><span class="pu">(</span><span class="str">'https://api.example.com/posts'</span><span class="pu">)</span>
+  <span class="kw">const</span> <span class="vr">posts</span> <span class="pu">=</span> <span class="kw">await</span> <span class="vr">res</span><span class="pu">.</span><span class="fn">json</span><span class="pu">()</span>
+  <span class="kw">return</span> <span class="op">&lt;ul&gt;</span><span class="pu">{</span><span class="vr">posts</span><span class="pu">.</span><span class="fn">map</span><span class="pu">(</span><span class="vr">p</span> <span class="pu">=></span> <span class="op">&lt;li</span> <span class="fn">key</span><span class="pu">={</span><span class="vr">p</span><span class="pu">.</span><span class="vr">id</span><span class="pu">}&gt;{</span><span class="vr">p</span><span class="pu">.</span><span class="vr">title</span><span class="pu">}&lt;/</span><span class="op">li</span><span class="pu">&gt;))}</span><span class="op">&lt;/ul&gt;</span>
+<span class="pu">}</span></pre>
+  </div>
+
+  <div class="demo-wrap">
+    <div class="demo-bar"><span class="demo-label">Simulate fetch()</span><span class="demo-live">● interactive</span></div>
+    <div class="demo-body">
+      <div class="d-row d-gap">
+        <button class="d-btn primary" onclick="simFetch(true)">fetch() — success</button>
+        <button class="d-btn" onclick="simFetch(false)" style="border-color:#fca5a5;color:var(--red)">fetch() — network error</button>
+      </div>
+      <div class="d-output" id="fetch-out">Click a button above to simulate a request...</div>
+    </div>
+  </div>
+</section>
+
+<!-- Optional chaining -->
+<section class="section" id="js-optional">
+  <h3 class="section-title">Optional chaining (?.) <span class="section-badge tag-js">JS</span></h3>
+  <p class="body-text">When data comes from an API, it might be <code>null</code> or <code>undefined</code>. <code>?.</code> safely accesses nested properties without crashing.</p>
+
+  <div class="code-wrap">
+    <div class="code-bar"><span class="code-file">optional.ts</span><span class="code-lang">TypeScript</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+    <pre class="code-body"><span class="kw">const</span> <span class="vr">user</span> <span class="pu">=</span> <span class="kw">null</span>
+
+<span class="cm">// ❌ This crashes: Cannot read property 'name' of null</span>
+<span class="vr">user</span><span class="pu">.</span><span class="vr">name</span>
+
+<span class="cm">// ✓ Optional chaining — returns undefined instead of crashing</span>
+<span class="vr">user</span><span class="pu">?.</span><span class="vr">name</span>              <span class="cm">// undefined (safe)</span>
+<span class="vr">user</span><span class="pu">?.</span><span class="vr">address</span><span class="pu">?.</span><span class="vr">city</span>    <span class="cm">// undefined (safe, chained)</span>
+
+<span class="cm">// With arrays from APIs</span>
+<span class="kw">const</span> <span class="pu">{</span> <span class="vr">data</span> <span class="pu">}</span> <span class="pu">=</span> <span class="kw">await</span> <span class="vr">supabase</span><span class="pu">.</span><span class="fn">from</span><span class="pu">(</span><span class="str">'posts'</span><span class="pu">).</span><span class="fn">select</span><span class="pu">(</span><span class="str">'*'</span><span class="pu">)</span>
+<span class="vr">data</span><span class="pu">?.</span><span class="fn">map</span><span class="pu">(</span><span class="vr">post</span> <span class="pu">=></span> <span class="op">&lt;li&gt;{</span><span class="vr">post</span><span class="pu">.</span><span class="vr">title</span><span class="pu">}&lt;/</span><span class="op">li</span><span class="pu">&gt;)</span>  <span class="cm">// safe even if data is null</span></pre>
+  </div>
+</section>
+
+
+<!-- =====================================================
+     CHAPTER 2 — PAGES & ROUTING
+===================================================== -->
+<div class="chapter-divider" id="ch-pages">
+  <div class="chapter-number">Chapter 02</div>
+  <h2 class="chapter-title">Pages &amp; Routing</h2>
+  <p class="chapter-intro">
+    In Next.js, the folder structure is the routing system. Create a folder, add a <code>page.tsx</code>, and that's your URL — no config needed.
+  </p>
+</div>
+
+<section class="section" id="pages-app-router">
+  <h3 class="section-title">App Router basics <span class="section-badge tag-next">Next</span></h3>
+  <p class="body-text">Every <code>page.tsx</code> exports a default React component. The folder name becomes the URL segment.</p>
+
+  <div class="code-wrap">
+    <div class="code-bar"><span class="code-file">app/about/page.tsx</span><span class="code-lang">TypeScript</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+    <pre class="code-body"><span class="cm">// This file = yoursite.com/about</span>
+<span class="kw">export default function</span> <span class="fn">AboutPage</span><span class="pu">() {</span>
+  <span class="kw">return</span> <span class="pu">(</span>
+    <span class="op">&lt;main&gt;</span>
+      <span class="op">&lt;h1&gt;</span>About Me<span class="op">&lt;/h1&gt;</span>
+      <span class="op">&lt;p&gt;</span>Welcome to my site!<span class="op">&lt;/p&gt;</span>
+    <span class="op">&lt;/main&gt;</span>
+  <span class="pu">)</span>
+<span class="pu">}</span></pre>
+  </div>
+
+  <p class="body-text">Special filenames Next.js recognizes:</p>
+  <div class="file-tree">
+<span class="ft-file">page.tsx</span>      <span class="ft-note">← the page itself</span>
+<span class="ft-file">layout.tsx</span>    <span class="ft-note">← wraps all pages in this folder</span>
+<span class="ft-file">loading.tsx</span>   <span class="ft-note">← shown while data loads</span>
+<span class="ft-file">error.tsx</span>     <span class="ft-note">← shown if something crashes</span>
+<span class="ft-file">not-found.tsx</span> <span class="ft-note">← shown for 404 errors</span>
+<span class="ft-file">route.ts</span>      <span class="ft-note">← API endpoint (no UI)</span>
+  </div>
+</section>
+
+<section class="section" id="pages-link">
+  <h3 class="section-title">Link &amp; navigation <span class="section-badge tag-next">Next</span></h3>
+  <p class="body-text">Use <code>&lt;Link&gt;</code> instead of <code>&lt;a&gt;</code>. It prefetches pages and navigates instantly without a full reload.</p>
+
+  <div class="compare">
+    <div class="compare-box compare-bad">
+      <h4>❌ Plain &lt;a&gt; tag</h4>
+      <ul>
+        <li>Full page reload every time</li>
+        <li>Slow, loses React state</li>
+        <li>No prefetching</li>
+      </ul>
+    </div>
+    <div class="compare-box compare-good">
+      <h4>✓ Next.js &lt;Link&gt;</h4>
+      <ul>
+        <li>Instant navigation</li>
+        <li>Prefetches on hover</li>
+        <li>Keeps React state</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-bar"><span class="code-file">Navbar.tsx</span><span class="code-lang">TypeScript</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+    <pre class="code-body"><span class="kw">import</span> <span class="vr">Link</span> <span class="kw">from</span> <span class="str">'next/link'</span>
+
+<span class="kw">export default function</span> <span class="fn">Navbar</span><span class="pu">() {</span>
+  <span class="kw">return</span> <span class="pu">(</span>
+    <span class="op">&lt;nav&gt;</span>
+      <span class="op">&lt;</span><span class="vr">Link</span> <span class="fn">href</span><span class="pu">=</span><span class="str">"/"</span><span class="op">&gt;</span>Home<span class="op">&lt;/</span><span class="vr">Link</span><span class="op">&gt;</span>
+      <span class="op">&lt;</span><span class="vr">Link</span> <span class="fn">href</span><span class="pu">=</span><span class="str">"/about"</span><span class="op">&gt;</span>About<span class="op">&lt;/</span><span class="vr">Link</span><span class="op">&gt;</span>
+      <span class="op">&lt;</span><span class="vr">Link</span> <span class="fn">href</span><span class="pu">=</span><span class="str">"/blog"</span><span class="op">&gt;</span>Blog<span class="op">&lt;/</span><span class="vr">Link</span><span class="op">&gt;</span>
+    <span class="op">&lt;/nav&gt;</span>
+  <span class="pu">)</span>
+<span class="pu">}</span>
+
+<span class="cm">// Programmatic navigation — after form submit, etc.</span>
+<span class="str">'use client'</span>
+<span class="kw">import</span> <span class="pu">{</span> <span class="vr">useRouter</span> <span class="pu">}</span> <span class="kw">from</span> <span class="str">'next/navigation'</span>
+
+<span class="kw">const</span> <span class="vr">router</span> <span class="pu">=</span> <span class="fn">useRouter</span><span class="pu">()</span>
+<span class="vr">router</span><span class="pu">.</span><span class="fn">push</span><span class="pu">(</span><span class="str">'/dashboard'</span><span class="pu">)</span>   <span class="cm">// navigate programmatically</span></pre>
+  </div>
+</section>
+
+<section class="section" id="pages-dynamic">
+  <h3 class="section-title">Dynamic routes [slug] <span class="section-badge tag-next">Next</span></h3>
+  <p class="body-text">Wrap a folder name in <code>[brackets]</code> to match any URL segment. One file handles <code>/blog/hello</code>, <code>/blog/my-post</code>, etc.</p>
+
+  <div class="code-wrap">
+    <div class="code-bar"><span class="code-file">app/blog/[slug]/page.tsx</span><span class="code-lang">TypeScript</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+    <pre class="code-body"><span class="cm">// Next.js passes the URL segment via the "params" prop</span>
+<span class="kw">export default function</span> <span class="fn">BlogPost</span><span class="pu">({</span>
+  <span class="vr">params</span><span class="pu">,</span>
+<span class="pu">}: {</span>
+  <span class="vr">params</span><span class="pu">: {</span> <span class="vr">slug</span><span class="pu">:</span> <span class="vr">string</span> <span class="pu">}</span>
+<span class="pu">}) {</span>
+  <span class="cm">// URL: /blog/hello-world  →  params.slug = "hello-world"</span>
+  <span class="kw">return</span> <span class="op">&lt;h1&gt;</span>Post: <span class="pu">{</span><span class="vr">params</span><span class="pu">.</span><span class="vr">slug</span><span class="pu">}</span><span class="op">&lt;/h1&gt;</span>
+<span class="pu">}</span>
+
+<span class="cm">// In real app: use params.slug to fetch from DB</span>
+<span class="kw">const</span> <span class="pu">{</span> <span class="vr">data</span> <span class="pu">}</span> <span class="pu">=</span> <span class="kw">await</span> <span class="vr">supabase</span>
+  <span class="pu">.</span><span class="fn">from</span><span class="pu">(</span><span class="str">'posts'</span><span class="pu">)</span>
+  <span class="pu">.</span><span class="fn">select</span><span class="pu">(</span><span class="str">'*'</span><span class="pu">)</span>
+  <span class="pu">.</span><span class="fn">eq</span><span class="pu">(</span><span class="str">'slug'</span><span class="pu">,</span> <span class="vr">params</span><span class="pu">.</span><span class="vr">slug</span><span class="pu">)</span>
+  <span class="pu">.</span><span class="fn">single</span><span class="pu">()</span></pre>
+  </div>
+</section>
+
+<section class="section" id="pages-layout">
+  <h3 class="section-title">layout.tsx <span class="section-badge tag-next">Next</span></h3>
+  <p class="body-text">A <code>layout.tsx</code> wraps every page in its folder — and in nested folders too. Use it for navbars, footers, fonts.</p>
+
+  <div class="code-wrap">
+    <div class="code-bar"><span class="code-file">app/layout.tsx</span><span class="code-lang">TypeScript</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+    <pre class="code-body"><span class="kw">export default function</span> <span class="fn">RootLayout</span><span class="pu">({</span>
+  <span class="vr">children</span><span class="pu">,</span>
+<span class="pu">}: {</span>
+  <span class="vr">children</span><span class="pu">:</span> <span class="vr">React</span><span class="pu">.</span><span class="vr">ReactNode</span>
+<span class="pu">}) {</span>
+  <span class="kw">return</span> <span class="pu">(</span>
+    <span class="op">&lt;html</span> <span class="fn">lang</span><span class="pu">=</span><span class="str">"en"</span><span class="op">&gt;</span>
+      <span class="op">&lt;body&gt;</span>
+        <span class="op">&lt;</span><span class="vr">Navbar</span> <span class="op">/&gt;</span>
+        <span class="pu">{</span><span class="vr">children</span><span class="pu">}</span>    <span class="cm">{'/* every page renders here */'}</span>
+        <span class="op">&lt;</span><span class="vr">Footer</span> <span class="op">/&gt;</span>
+      <span class="op">&lt;/body&gt;</span>
+    <span class="op">&lt;/html&gt;</span>
+  <span class="pu">)</span>
+<span class="pu">}</span></pre>
+  </div>
+</section>
+
+
+<!-- =====================================================
+     CHAPTER 3 — EVENTS & STATE
+===================================================== -->
+<div class="chapter-divider" id="ch-events">
+  <div class="chapter-number">Chapter 03</div>
+  <h2 class="chapter-title">Events &amp; State</h2>
+  <p class="chapter-intro">
+    Static pages are boring. Events let you respond to user actions — clicking, typing, submitting. State lets you store values that change and re-render the UI automatically.
+  </p>
+</div>
+
+<section class="section" id="events-client">
+  <h3 class="section-title">Server vs Client Components <span class="section-badge tag-next">Next</span></h3>
+  <p class="body-text">This is the most important concept in App Router. By default everything is a Server Component. Add <code>'use client'</code> to the top of a file to make it interactive.</p>
+
+  <div class="compare">
+    <div class="compare-box" style="border-color:var(--rule2)">
+      <h4 style="color:var(--ink3)">Server Component (default)</h4>
+      <ul>
+        <li>Runs on the server</li>
+        <li>Can fetch from database</li>
+        <li>No useState, onClick, useEffect</li>
+        <li>Faster — no JS sent to browser</li>
+      </ul>
+    </div>
+    <div class="compare-box" style="border-color:#818cf8">
+      <h4 style="color:#3730a3">Client Component ('use client')</h4>
+      <ul>
+        <li>Runs in the browser</li>
+        <li>Can use useState, events, refs</li>
+        <li>Cannot directly query a database</li>
+        <li>Needed for any interactivity</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout callout-info">
+    <strong>Simple rule</strong>
+    If your component needs <code>onClick</code>, <code>onChange</code>, <code>useState</code>, or <code>useEffect</code> — add <code>'use client'</code> as the very first line.
+  </div>
+</section>
+
+<section class="section" id="events-usestate">
+  <h3 class="section-title">useState <span class="section-badge tag-js">JS</span></h3>
+  <p class="body-text"><code>useState</code> stores a value that can change. When you update it, React automatically re-renders the component.</p>
+
+  <div class="code-wrap">
+    <div class="code-bar"><span class="code-file">Counter.tsx</span><span class="code-lang">TypeScript</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+    <pre class="code-body"><span class="str">'use client'</span>
+<span class="kw">import</span> <span class="pu">{</span> <span class="vr">useState</span> <span class="pu">}</span> <span class="kw">from</span> <span class="str">'react'</span>
+
+<span class="kw">export default function</span> <span class="fn">Counter</span><span class="pu">() {</span>
+  <span class="cm">// [currentValue, updateFunction] = useState(initialValue)</span>
+  <span class="kw">const</span> <span class="pu">[</span><span class="vr">count</span><span class="pu">,</span> <span class="vr">setCount</span><span class="pu">]</span> <span class="pu">=</span> <span class="fn">useState</span><span class="pu">(</span><span class="nm">0</span><span class="pu">)</span>
+
+  <span class="kw">return</span> <span class="pu">(</span>
+    <span class="op">&lt;div&gt;</span>
+      <span class="op">&lt;p&gt;</span>Count: <span class="pu">{</span><span class="vr">count</span><span class="pu">}</span><span class="op">&lt;/p&gt;</span>
+      <span class="op">&lt;button</span> <span class="fn">onClick</span><span class="pu">={() =></span> <span class="fn">setCount</span><span class="pu">(</span><span class="vr">count</span> <span class="pu">+</span> <span class="nm">1</span><span class="pu">)}&gt;</span>+<span class="op">&lt;/button&gt;</span>
+      <span class="op">&lt;button</span> <span class="fn">onClick</span><span class="pu">={() =></span> <span class="fn">setCount</span><span class="pu">(</span><span class="vr">count</span> <span class="pu">-</span> <span class="nm">1</span><span class="pu">)}&gt;</span>−<span class="op">&lt;/button&gt;</span>
+      <span class="op">&lt;button</span> <span class="fn">onClick</span><span class="pu">={() =></span> <span class="fn">setCount</span><span class="pu">(</span><span class="nm">0</span><span class="pu">)}&gt;</span>Reset<span class="op">&lt;/button&gt;</span>
+    <span class="op">&lt;/div&gt;</span>
+  <span class="pu">)</span>
+<span class="pu">}</span></pre>
+  </div>
+
+  <div class="demo-wrap">
+    <div class="demo-bar"><span class="demo-label">Live — counter</span><span class="demo-live">● interactive</span></div>
+    <div class="demo-body">
+      <div class="d-row" style="align-items:center; gap:14px">
+        <button class="d-btn" onclick="ctr(-1)">− Minus</button>
+        <div style="font-family:var(--mono);font-size:32px;font-weight:600;color:var(--ink);min-width:50px;text-align:center" id="ctr-display">0</div>
+        <button class="d-btn primary" onclick="ctr(1)">+ Plus</button>
+        <button class="d-btn" onclick="ctrReset()" style="margin-left:8px;font-size:11px">Reset</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="events-onclick">
+  <h3 class="section-title">onClick &amp; events <span class="section-badge tag-js">JS</span></h3>
+  <p class="body-text">Event handlers are functions you pass to elements. They run when the user interacts.</p>
+
+  <div class="code-wrap">
+    <div class="code-bar"><span class="code-file">events.tsx</span><span class="code-lang">TypeScript</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+    <pre class="code-body"><span class="cm">// Inline handler</span>
+<span class="op">&lt;button</span> <span class="fn">onClick</span><span class="pu">={() =></span> <span class="vr">console</span><span class="pu">.</span><span class="fn">log</span><span class="pu">(</span><span class="str">'clicked!'</span><span class="pu">)}&gt;</span>Click me<span class="op">&lt;/button&gt;</span>
+
+<span class="cm">// Named handler (cleaner for complex logic)</span>
+<span class="kw">function</span> <span class="fn">handleClick</span><span class="pu">() {</span>
+  <span class="fn">setLoading</span><span class="pu">(</span><span class="kw">true</span><span class="pu">)</span>
+  <span class="cm">// do something...</span>
+  <span class="fn">setLoading</span><span class="pu">(</span><span class="kw">false</span><span class="pu">)</span>
+<span class="pu">}</span>
+<span class="op">&lt;button</span> <span class="fn">onClick</span><span class="pu">={</span><span class="fn">handleClick</span><span class="pu">}&gt;</span>Submit<span class="op">&lt;/button&gt;</span>
+
+<span class="cm">// Common events</span>
+<span class="fn">onClick</span>    <span class="cm">// click / tap</span>
+<span class="fn">onChange</span>   <span class="cm">// input value changed</span>
+<span class="fn">onSubmit</span>   <span class="cm">// form submitted</span>
+<span class="fn">onKeyDown</span>  <span class="cm">// keyboard key pressed</span>
+<span class="fn">onMouseEnter</span> <span class="cm">// hover</span></pre>
+  </div>
+
+  <div class="demo-wrap">
+    <div class="demo-bar"><span class="demo-label">Live — toggle with boolean state</span><span class="demo-live">● interactive</span></div>
+    <div class="demo-body">
+      <div class="d-row" style="align-items:center;gap:16px">
+        <button id="toggle-btn" onclick="doToggle()" style="
+          width:52px;height:28px;border-radius:14px;border:none;
+          background:#d1d5db;cursor:pointer;position:relative;transition:background .2s
+        ">
+          <div id="toggle-knob" style="
+            width:20px;height:20px;border-radius:50%;background:#fff;
+            position:absolute;top:4px;left:4px;transition:left .2s
+          "></div>
+        </button>
+        <code id="toggle-state" style="font-size:13px">isOn = false</code>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="events-forms">
+  <h3 class="section-title">Forms &amp; onChange <span class="section-badge tag-js">JS</span></h3>
+  <p class="body-text">In React, inputs are <em>controlled</em> — their value always comes from state. <code>onChange</code> updates state as the user types.</p>
+
+  <div class="code-wrap">
+    <div class="code-bar"><span class="code-file">ContactForm.tsx</span><span class="code-lang">TypeScript</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+    <pre class="code-body"><span class="str">'use client'</span>
+<span class="kw">import</span> <span class="pu">{</span> <span class="vr">useState</span> <span class="pu">}</span> <span class="kw">from</span> <span class="str">'react'</span>
+
+<span class="kw">export default function</span> <span class="fn">ContactForm</span><span class="pu">() {</span>
+  <span class="kw">const</span> <span class="pu">[</span><span class="vr">form</span><span class="pu">,</span> <span class="vr">setForm</span><span class="pu">]</span> <span class="pu">=</span> <span class="fn">useState</span><span class="pu">({</span>
+    <span class="vr">name</span><span class="pu">:</span>  <span class="str">''</span><span class="pu">,</span>
+    <span class="vr">email</span><span class="pu">:</span> <span class="str">''</span><span class="pu">,</span>
+  <span class="pu">})</span>
+
+  <span class="cm">// Update one field, keep the rest (spread pattern)</span>
+  <span class="kw">function</span> <span class="fn">update</span><span class="pu">(</span><span class="vr">field</span><span class="pu">:</span> <span class="vr">string</span><span class="pu">,</span> <span class="vr">value</span><span class="pu">:</span> <span class="vr">string</span><span class="pu">) {</span>
+    <span class="fn">setForm</span><span class="pu">(</span><span class="vr">prev</span> <span class="pu">=></span> <span class="pu">({</span> <span class="pu">...</span><span class="vr">prev</span><span class="pu">,</span> <span class="pu">[</span><span class="vr">field</span><span class="pu">]:</span> <span class="vr">value</span> <span class="pu">}))</span>
+  <span class="pu">}</span>
+
+  <span class="kw">return</span> <span class="pu">(</span>
+    <span class="op">&lt;form&gt;</span>
+      <span class="op">&lt;input</span>
+        <span class="fn">value</span><span class="pu">={</span><span class="vr">form</span><span class="pu">.</span><span class="vr">name</span><span class="pu">}</span>
+        <span class="fn">onChange</span><span class="pu">={</span><span class="vr">e</span> <span class="pu">=></span> <span class="fn">update</span><span class="pu">(</span><span class="str">'name'</span><span class="pu">,</span> <span class="vr">e</span><span class="pu">.</span><span class="vr">target</span><span class="pu">.</span><span class="vr">value</span><span class="pu">)}</span>
+        <span class="fn">placeholder</span><span class="pu">=</span><span class="str">"Your name"</span>
+      <span class="op">/&gt;</span>
+      <span class="op">&lt;input</span>
+        <span class="fn">value</span><span class="pu">={</span><span class="vr">form</span><span class="pu">.</span><span class="vr">email</span><span class="pu">}</span>
+        <span class="fn">onChange</span><span class="pu">={</span><span class="vr">e</span> <span class="pu">=></span> <span class="fn">update</span><span class="pu">(</span><span class="str">'email'</span><span class="pu">,</span> <span class="vr">e</span><span class="pu">.</span><span class="vr">target</span><span class="pu">.</span><span class="vr">value</span><span class="pu">)}</span>
+        <span class="fn">placeholder</span><span class="pu">=</span><span class="str">"Email address"</span>
+      <span class="op">/&gt;</span>
+    <span class="op">&lt;/form&gt;</span>
+  <span class="pu">)</span>
+<span class="pu">}</span></pre>
+  </div>
+
+  <div class="demo-wrap">
+    <div class="demo-bar"><span class="demo-label">Live — controlled form (watch state update)</span><span class="demo-live">● interactive</span></div>
+    <div class="demo-body">
+      <div style="display:grid;gap:8px;margin-bottom:10px">
+        <input class="d-input" id="form-name" placeholder="Your name..." oninput="updateForm()">
+        <input class="d-input" id="form-email" placeholder="Email address..." oninput="updateForm()">
+      </div>
+      <div class="d-output" id="form-out">{ name: "", email: "" }</div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="events-useeffect">
+  <h3 class="section-title">useEffect <span class="section-badge tag-js">JS</span></h3>
+  <p class="body-text"><code>useEffect</code> runs code after the component renders — good for fetching data on load, setting up timers, or syncing with external things.</p>
+
+  <div class="code-wrap">
+    <div class="code-bar"><span class="code-file">PostList.tsx</span><span class="code-lang">TypeScript</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+    <pre class="code-body"><span class="str">'use client'</span>
+<span class="kw">import</span> <span class="pu">{</span> <span class="vr">useState</span><span class="pu">,</span> <span class="vr">useEffect</span> <span class="pu">}</span> <span class="kw">from</span> <span class="str">'react'</span>
+
+<span class="kw">export default function</span> <span class="fn">PostList</span><span class="pu">() {</span>
+  <span class="kw">const</span> <span class="pu">[</span><span class="vr">posts</span><span class="pu">,</span>   <span class="vr">setPosts</span><span class="pu">]</span>   <span class="pu">=</span> <span class="fn">useState</span><span class="pu">([])</span>
+  <span class="kw">const</span> <span class="pu">[</span><span class="vr">loading</span><span class="pu">,</span> <span class="vr">setLoading</span><span class="pu">]</span> <span class="pu">=</span> <span class="fn">useState</span><span class="pu">(</span><span class="kw">true</span><span class="pu">)</span>
+
+  <span class="fn">useEffect</span><span class="pu">(() =></span> <span class="pu">{</span>
+    <span class="cm">// Runs once when the component mounts</span>
+    <span class="kw">async function</span> <span class="fn">load</span><span class="pu">() {</span>
+      <span class="kw">const</span> <span class="vr">res</span>  <span class="pu">=</span> <span class="kw">await</span> <span class="fn">fetch</span><span class="pu">(</span><span class="str">'/api/posts'</span><span class="pu">)</span>
+      <span class="kw">const</span> <span class="vr">data</span> <span class="pu">=</span> <span class="kw">await</span> <span class="vr">res</span><span class="pu">.</span><span class="fn">json</span><span class="pu">()</span>
+      <span class="fn">setPosts</span><span class="pu">(</span><span class="vr">data</span><span class="pu">)</span>
+      <span class="fn">setLoading</span><span class="pu">(</span><span class="kw">false</span><span class="pu">)</span>
+    <span class="pu">}</span>
+    <span class="fn">load</span><span class="pu">()</span>
+  <span class="pu">},</span> <span class="pu">[])</span>  <span class="cm">// ← empty array = run once on mount</span>
+
+  <span class="kw">if</span> <span class="pu">(</span><span class="vr">loading</span><span class="pu">)</span> <span class="kw">return</span> <span class="op">&lt;p&gt;</span>Loading...<span class="op">&lt;/p&gt;</span>
+  <span class="kw">return</span> <span class="op">&lt;ul&gt;</span><span class="pu">{</span><span class="vr">posts</span><span class="pu">.</span><span class="fn">map</span><span class="pu">(</span><span class="vr">p</span> <span class="pu">=></span> <span class="op">&lt;li</span> <span class="fn">key</span><span class="pu">={</span><span class="vr">p</span><span class="pu">.</span><span class="vr">id</span><span class="pu">}&gt;{</span><span class="vr">p</span><span class="pu">.</span><span class="vr">title</span><span class="pu">}&lt;/</span><span class="op">li</span><span class="pu">&gt;))}</span><span class="op">&lt;/ul&gt;</span>
+<span class="pu">}</span></pre>
+  </div>
+
+  <div class="callout callout-warn">
+    <strong>Tip</strong>
+    Prefer Server Components + <code>async/await</code> fetch for loading data in Next.js — it's simpler and faster. Use <code>useEffect</code> only in Client Components when you must.
+  </div>
+</section>
+
+<section class="section" id="events-lists">
+  <h3 class="section-title">Rendering lists <span class="section-badge tag-js">JS</span></h3>
+  <p class="body-text">Use <code>.map()</code> to turn an array into JSX. Always add a <code>key</code> prop — React uses it to track which items changed.</p>
+
+  <div class="code-wrap">
+    <div class="code-bar"><span class="code-file">TodoList.tsx</span><span class="code-lang">TypeScript</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+    <pre class="code-body"><span class="str">'use client'</span>
+<span class="kw">import</span> <span class="pu">{</span> <span class="vr">useState</span> <span class="pu">}</span> <span class="kw">from</span> <span class="str">'react'</span>
+
+<span class="kw">export default function</span> <span class="fn">TodoList</span><span class="pu">() {</span>
+  <span class="kw">const</span> <span class="pu">[</span><span class="vr">todos</span><span class="pu">,</span> <span class="vr">setTodos</span><span class="pu">]</span> <span class="pu">=</span> <span class="fn">useState</span><span class="pu">([</span><span class="str">'Buy milk'</span><span class="pu">,</span> <span class="str">'Do homework'</span><span class="pu">])</span>
+
+  <span class="cm">// Add item</span>
+  <span class="kw">function</span> <span class="fn">add</span><span class="pu">(</span><span class="vr">text</span><span class="pu">:</span> <span class="vr">string</span><span class="pu">) {</span>
+    <span class="fn">setTodos</span><span class="pu">(</span><span class="vr">prev</span> <span class="pu">=></span> <span class="pu">[...</span><span class="vr">prev</span><span class="pu">,</span> <span class="vr">text</span><span class="pu">])</span>
+  <span class="pu">}</span>
+
+  <span class="cm">// Remove item by index</span>
+  <span class="kw">function</span> <span class="fn">remove</span><span class="pu">(</span><span class="vr">i</span><span class="pu">:</span> <span class="vr">number</span><span class="pu">) {</span>
+    <span class="fn">setTodos</span><span class="pu">(</span><span class="vr">prev</span> <span class="pu">=></span> <span class="vr">prev</span><span class="pu">.</span><span class="fn">filter</span><span class="pu">((</span><span class="vr">_</span><span class="pu">,</span> <span class="vr">idx</span><span class="pu">) =></span> <span class="vr">idx</span> <span class="pu">!==</span> <span class="vr">i</span><span class="pu">))</span>
+  <span class="pu">}</span>
+
+  <span class="kw">return</span> <span class="pu">(</span>
+    <span class="op">&lt;ul&gt;</span>
+      <span class="pu">{</span><span class="vr">todos</span><span class="pu">.</span><span class="fn">map</span><span class="pu">((</span><span class="vr">todo</span><span class="pu">,</span> <span class="vr">i</span><span class="pu">) =></span> <span class="pu">(</span>
+        <span class="op">&lt;li</span> <span class="fn">key</span><span class="pu">={</span><span class="vr">i</span><span class="pu">}&gt;</span>
+          <span class="pu">{</span><span class="vr">todo</span><span class="pu">}</span>
+          <span class="op">&lt;button</span> <span class="fn">onClick</span><span class="pu">={() =></span> <span class="fn">remove</span><span class="pu">(</span><span class="vr">i</span><span class="pu">)}&gt;</span>✕<span class="op">&lt;/button&gt;</span>
+        <span class="op">&lt;/li&gt;</span>
+      <span class="pu">))}</span>
+    <span class="op">&lt;/ul&gt;</span>
+  <span class="pu">)</span>
+<span class="pu">}</span></pre>
+  </div>
+
+  <div class="demo-wrap">
+    <div class="demo-bar"><span class="demo-label">Live — todo list (add + remove)</span><span class="demo-live">● interactive</span></div>
+    <div class="demo-body">
+      <div class="d-row d-gap">
+        <input class="d-input" id="todo-input" placeholder="Add a task..." style="flex:1" onkeydown="if(event.key==='Enter')addTodo()">
+        <button class="d-btn primary" onclick="addTodo()">Add</button>
+      </div>
+      <div id="todo-list" style="display:grid;gap:6px"></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- =====================================================
+     CHAPTER 4 — BACKEND
+===================================================== -->
+<div class="chapter-divider" id="ch-backend">
+  <div class="chapter-number">Chapter 04</div>
+  <h2 class="chapter-title">Backend</h2>
+  <p class="chapter-intro">
+    Next.js lets you write backend code inside your project — no separate server. Route Handlers are API endpoints, Server Actions are functions that run on the server.
+  </p>
+</div>
+
+<section class="section" id="be-how">
+  <h3 class="section-title">How the web works <span class="section-badge tag-be">BE</span></h3>
+
+  <div class="steps">
+    <div class="step"><div class="step-n">1</div><div class="step-body"><strong>Request</strong> — your browser sends an HTTP request to a server (a computer somewhere in the world)</div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-body"><strong>Server logic</strong> — the server runs code, maybe queries a database, builds a response</div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-body"><strong>Response</strong> — the server sends back HTML, JSON, or a file</div></div>
+    <div class="step"><div class="step-n">4</div><div class="step-body"><strong>Render</strong> — your browser shows the HTML, or React processes the JSON</div></div>
+  </div>
+
+  <p class="body-text">HTTP methods tell the server what you want to do:</p>
+  <div style="display:grid;gap:6px;margin:14px 0">
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border:1px solid var(--rule2);border-radius:4px;font-size:13px">
+      <span class="method-get">GET</span> <span style="color:var(--ink2)">Read data — "give me all posts"</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border:1px solid var(--rule2);border-radius:4px;font-size:13px">
+      <span class="method-post">POST</span> <span style="color:var(--ink2)">Send new data — "create a post"</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border:1px solid var(--rule2);border-radius:4px;font-size:13px">
+      <span class="method-delete">DELETE</span> <span style="color:var(--ink2)">Remove data — "delete post #5"</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border:1px solid var(--rule2);border-radius:4px;font-size:13px">
+      <span style="font-family:var(--mono);font-size:11px;font-weight:700;color:#92520a;background:#fef3c7;padding:2px 7px;border-radius:3px">PATCH</span> <span style="color:var(--ink2)">Update data — "edit the title of post #5"</span>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="be-route-handlers">
+  <h3 class="section-title">Route Handlers <span class="section-badge tag-be">BE</span></h3>
+  <p class="body-text">Create <code>route.ts</code> inside <code>app/api/</code>. Export functions named <code>GET</code>, <code>POST</code>, etc. These become real API endpoints.</p>
+
+  <div class="code-wrap">
+    <div class="code-bar"><span class="code-file">app/api/posts/route.ts</span><span class="code-lang">TypeScript</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+    <pre class="code-body"><span class="kw">import</span> <span class="pu">{</span> <span class="vr">NextResponse</span> <span class="pu">}</span> <span class="kw">from</span> <span class="str">'next/server'</span>
+
+<span class="cm">// GET /api/posts</span>
+<span class="kw">export async function</span> <span class="fn">GET</span><span class="pu">() {</span>
+  <span class="kw">const</span> <span class="vr">posts</span> <span class="pu">=</span> <span class="pu">[</span>
+    <span class="pu">{</span> <span class="vr">id</span><span class="pu">:</span> <span class="nm">1</span><span class="pu">,</span> <span class="vr">title</span><span class="pu">:</span> <span class="str">'Hello World'</span> <span class="pu">},</span>
+  <span class="pu">]</span>
+  <span class="kw">return</span> <span class="vr">NextResponse</span><span class="pu">.</span><span class="fn">json</span><span class="pu">(</span><span class="vr">posts</span><span class="pu">)</span>
+<span class="pu">}</span>
+
+<span class="cm">// POST /api/posts  — creates a new post</span>
+<span class="kw">export async function</span> <span class="fn">POST</span><span class="pu">(</span><span class="vr">req</span><span class="pu">:</span> <span class="vr">Request</span><span class="pu">) {</span>
+  <span class="kw">const</span> <span class="vr">body</span> <span class="pu">=</span> <span class="kw">await</span> <span class="vr">req</span><span class="pu">.</span><span class="fn">json</span><span class="pu">()</span>
+  <span class="cm">// save body to database...</span>
+  <span class="kw">return</span> <span class="vr">NextResponse</span><span class="pu">.</span><span class="fn">json</span><span class="pu">({</span> <span class="vr">success</span><span class="pu">:</span> <span class="kw">true</span> <span class="pu">})</span>
+<span class="pu">}</span>
+
+<span class="cm">// DELETE /api/posts/[id]  →  app/api/posts/[id]/route.ts</span>
+<span class="kw">export async function</span> <span class="fn">DELETE</span><span class="pu">(</span>
+  <span class="vr">req</span><span class="pu">:</span> <span class="vr">Request</span><span class="pu">,</span>
+  <span class="pu">{</span> <span class="vr">params</span> <span class="pu">}: {</span> <span class="vr">params</span><span class="pu">: {</span> <span class="vr">id</span><span class="pu">:</span> <span class="vr">string</span> <span class="pu">}</span> <span class="pu">}</span>
+<span class="pu">) {</span>
+  <span class="cm">// delete row where id = params.id</span>
+  <span class="kw">return</span> <span class="vr">NextResponse</span><span class="pu">.</span><span class="fn">json</span><span class="pu">({</span> <span class="vr">deleted</span><span class="pu">:</span> <span class="kw">true</span> <span class="pu">})</span>
+<span class="pu">}</span></pre>
+  </div>
+
+  <div class="demo-wrap">
+    <div class="demo-bar"><span class="demo-label">Simulate API calls</span><span class="demo-live">● interactive</span></div>
+    <div class="demo-body">
+      <div class="d-row d-gap">
+        <button class="d-btn" onclick="simAPI('GET')" style="border-color:#86efac;color:var(--green)"><span class="method-get">GET</span> /api/posts</button>
+        <button class="d-btn" onclick="simAPI('POST')" style="border-color:#818cf8;color:#3730a3"><span class="method-post">POST</span> /api/posts</button>
+        <button class="d-btn" onclick="simAPI('DELETE')" style="border-color:#fca5a5;color:var(--red)"><span class="method-delete">DELETE</span> /api/posts/1</button>
+      </div>
+      <div class="d-output" id="api-out">Click a button to simulate a request...</div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="be-server-actions">
+  <h3 class="section-title">Server Actions <span class="section-badge tag-be">BE</span></h3>
+  <p class="body-text">Mark a function with <code>'use server'</code> and call it directly from a component — no API route needed. Cleaner, less boilerplate.</p>
+
+  <div class="code-wrap">
+    <div class="code-bar"><span class="code-file">app/actions.ts</span><span class="code-lang">TypeScript</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+    <pre class="code-body"><span class="str">'use server'</span>  <span class="cm">// whole file runs on server</span>
+
+<span class="kw">import</span> <span class="vr">supabase</span> <span class="kw">from</span> <span class="str">'@/lib/supabase'</span>
+
+<span class="kw">export async function</span> <span class="fn">createPost</span><span class="pu">(</span><span class="vr">title</span><span class="pu">:</span> <span class="vr">string</span><span class="pu">) {</span>
+  <span class="kw">const</span> <span class="pu">{</span> <span class="vr">data</span><span class="pu">,</span> <span class="vr">error</span> <span class="pu">}</span> <span class="pu">=</span> <span class="kw">await</span> <span class="vr">supabase</span>
+    <span class="pu">.</span><span class="fn">from</span><span class="pu">(</span><span class="str">'posts'</span><span class="pu">)</span>
+    <span class="pu">.</span><span class="fn">insert</span><span class="pu">({</span> <span class="vr">title</span> <span class="pu">})</span>
+    <span class="pu">.</span><span class="fn">select</span><span class="pu">()</span>
+    <span class="pu">.</span><span class="fn">single</span><span class="pu">()</span>
+  <span class="kw">if</span> <span class="pu">(</span><span class="vr">error</span><span class="pu">)</span> <span class="kw">throw</span> <span class="kw">new</span> <span class="vr">Error</span><span class="pu">(</span><span class="vr">error</span><span class="pu">.</span><span class="vr">message</span><span class="pu">)</span>
+  <span class="kw">return</span> <span class="vr">data</span>
+<span class="pu">}</span></pre>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-bar"><span class="code-file">app/new-post/page.tsx</span><span class="code-lang">TypeScript</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+    <pre class="code-body"><span class="str">'use client'</span>
+<span class="kw">import</span> <span class="pu">{</span> <span class="vr">createPost</span> <span class="pu">}</span> <span class="kw">from</span> <span class="str">'../actions'</span>
+<span class="kw">import</span> <span class="pu">{</span> <span class="vr">useState</span> <span class="pu">}</span> <span class="kw">from</span> <span class="str">'react'</span>
+
+<span class="kw">export default function</span> <span class="fn">NewPost</span><span class="pu">() {</span>
+  <span class="kw">const</span> <span class="pu">[</span><span class="vr">title</span><span class="pu">,</span>   <span class="vr">setTitle</span><span class="pu">]</span>   <span class="pu">=</span> <span class="fn">useState</span><span class="pu">(</span><span class="str">''</span><span class="pu">)</span>
+  <span class="kw">const</span> <span class="pu">[</span><span class="vr">loading</span><span class="pu">,</span> <span class="vr">setLoading</span><span class="pu">]</span> <span class="pu">=</span> <span class="fn">useState</span><span class="pu">(</span><span class="kw">false</span><span class="pu">)</span>
+
+  <span class="kw">async function</span> <span class="fn">submit</span><span class="pu">() {</span>
+    <span class="fn">setLoading</span><span class="pu">(</span><span class="kw">true</span><span class="pu">)</span>
+    <span class="kw">const</span> <span class="vr">post</span> <span class="pu">=</span> <span class="kw">await</span> <span class="fn">createPost</span><span class="pu">(</span><span class="vr">title</span><span class="pu">)</span>  <span class="cm">// calls server!</span>
+    <span class="fn">setLoading</span><span class="pu">(</span><span class="kw">false</span><span class="pu">)</span>
+    <span class="vr">console</span><span class="pu">.</span><span class="fn">log</span><span class="pu">(</span><span class="str">'created:'</span><span class="pu">,</span> <span class="vr">post</span><span class="pu">)</span>
+  <span class="pu">}</span>
+
+  <span class="kw">return</span> <span class="pu">(</span>
+    <span class="op">&lt;div&gt;</span>
+      <span class="op">&lt;input</span> <span class="fn">value</span><span class="pu">={</span><span class="vr">title</span><span class="pu">}</span> <span class="fn">onChange</span><span class="pu">={</span><span class="vr">e</span> <span class="pu">=></span> <span class="fn">setTitle</span><span class="pu">(</span><span class="vr">e</span><span class="pu">.</span><span class="vr">target</span><span class="pu">.</span><span class="vr">value</span><span class="pu">)}</span> <span class="op">/&gt;</span>
+      <span class="op">&lt;button</span> <span class="fn">onClick</span><span class="pu">={</span><span class="fn">submit</span><span class="pu">}</span> <span class="fn">disabled</span><span class="pu">={</span><span class="vr">loading</span><span class="pu">}&gt;</span>
+        <span class="pu">{</span><span class="vr">loading</span> <span class="pu">?</span> <span class="str">'Saving...'</span> <span class="pu">:</span> <span class="str">'Publish'</span><span class="pu">}</span>
+      <span class="op">&lt;/button&gt;</span>
+    <span class="op">&lt;/div&gt;</span>
+  <span class="pu">)</span>
+<span class="pu">}</span></pre>
+  </div>
+</section>
+
+<section class="section" id="be-env">
+  <h3 class="section-title">Environment variables <span class="section-badge tag-be">BE</span></h3>
+  <p class="body-text">Never put secrets (API keys, passwords) in your code. Store them in <code>.env.local</code> — this file stays on your machine and never gets pushed to GitHub.</p>
+
+  <div class="code-wrap">
+    <div class="code-bar"><span class="code-file">.env.local</span><span class="code-lang">env</span></div>
+    <pre class="code-body"><span class="cm"># NEXT_PUBLIC_ prefix = accessible in browser too</span>
+NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGci...
+
+<span class="cm"># No prefix = server only (NEVER sent to browser)</span>
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGci...
+DATABASE_PASSWORD=super-secret-123</pre>
+  </div>
+
+  <div class="callout callout-warn">
+    <strong>Critical</strong>
+    Add <code>.env.local</code> to your <code>.gitignore</code> file. If you accidentally push it to GitHub, rotate (regenerate) all your keys immediately.
+  </div>
+</section>
+
+<section class="section" id="be-supabase">
+  <h3 class="section-title">Supabase setup <span class="section-badge tag-be">BE</span></h3>
+
+  <div class="steps">
+    <div class="step"><div class="step-n">1</div><div class="step-body">Go to <strong>supabase.com</strong>, sign up, create a project. Create a table (e.g. <code>posts</code>) in the Table Editor.</div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-body">Copy <strong>Project URL</strong> and <strong>anon key</strong> from Settings → API. Paste into <code>.env.local</code>.</div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-body">Install the SDK: <code>npm install @supabase/supabase-js</code></div></div>
+    <div class="step"><div class="step-n">4</div><div class="step-body">Create your client file below and import it wherever you need the database.</div></div>
+  </div>
+
+  <div class="code-wrap">
+    <div class="code-bar"><span class="code-file">lib/supabase.ts</span><span class="code-lang">TypeScript</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+    <pre class="code-body"><span class="kw">import</span> <span class="pu">{</span> <span class="vr">createClient</span> <span class="pu">}</span> <span class="kw">from</span> <span class="str">'@supabase/supabase-js'</span>
+
+<span class="kw">const</span> <span class="vr">supabase</span> <span class="pu">=</span> <span class="fn">createClient</span><span class="pu">(</span>
+  <span class="vr">process</span><span class="pu">.</span><span class="vr">env</span><span class="pu">.</span><span class="vr">NEXT_PUBLIC_SUPABASE_URL</span><span class="pu">!,</span>
+  <span class="vr">process</span><span class="pu">.</span><span class="vr">env</span><span class="pu">.</span><span class="vr">NEXT_PUBLIC_SUPABASE_ANON_KEY</span><span class="pu">!</span>
+<span class="pu">)</span>
+
+<span class="kw">export default</span> <span class="vr">supabase</span></pre>
+  </div>
+</section>
+
+<section class="section" id="be-crud">
+  <h3 class="section-title">CRUD operations <span class="section-badge tag-be">BE</span></h3>
+  <p class="body-text">CRUD = Create, Read, Update, Delete — the four things you do with any data.</p>
+
+  <div class="code-wrap">
+    <div class="code-bar"><span class="code-file">db-operations.ts</span><span class="code-lang">TypeScript</span><button class="code-copy" onclick="copyCode(this)">copy</button></div>
+    <pre class="code-body"><span class="kw">import</span> <span class="vr">supabase</span> <span class="kw">from</span> <span class="str">'@/lib/supabase'</span>
+
+<span class="cm">// READ — get all posts, newest first</span>
+<span class="kw">const</span> <span class="pu">{</span> <span class="vr">data</span> <span class="pu">}</span> <span class="pu">=</span> <span class="kw">await</span> <span class="vr">supabase</span>
+  <span class="pu">.</span><span class="fn">from</span><span class="pu">(</span><span class="str">'posts'</span><span class="pu">)</span>
+  <span class="pu">.</span><span class="fn">select</span><span class="pu">(</span><span class="str">'*'</span><span class="pu">)</span>
+  <span class="pu">.</span><span class="fn">order</span><span class="pu">(</span><span class="str">'created_at'</span><span class="pu">,</span> <span class="pu">{</span> <span class="vr">ascending</span><span class="pu">:</span> <span class="kw">false</span> <span class="pu">})</span>
+
+<span class="cm">// READ — one post by id</span>
+<span class="kw">const</span> <span class="pu">{</span> <span class="vr">data</span><span class="pu">:</span> <span class="vr">post</span> <span class="pu">}</span> <span class="pu">=</span> <span class="kw">await</span> <span class="vr">supabase</span>
+  <span class="pu">.</span><span class="fn">from</span><span class="pu">(</span><span class="str">'posts'</span><span class="pu">)</span>
+  <span class="pu">.</span><span class="fn">select</span><span class="pu">(</span><span class="str">'*'</span><span class="pu">)</span>
+  <span class="pu">.</span><span class="fn">eq</span><span class="pu">(</span><span class="str">'id'</span><span class="pu">,</span> <span class="nm">5</span><span class="pu">)</span>
+  <span class="pu">.</span><span class="fn">single</span><span class="pu">()</span>
+
+<span class="cm">// CREATE — insert a new row</span>
+<span class="kw">await</span> <span class="vr">supabase</span>
+  <span class="pu">.</span><span class="fn">from</span><span class="pu">(</span><span class="str">'posts'</span><span class="pu">)</span>
+  <span class="pu">.</span><span class="fn">insert</span><span class="pu">({</span> <span class="vr">title</span><span class="pu">:</span> <span class="str">'New post'</span><span class="pu">,</span> <span class="vr">content</span><span class="pu">:</span> <span class="str">'Hello!'</span> <span class="pu">})</span>
+
+<span class="cm">// UPDATE — change fields on a row</span>
+<span class="kw">await</span> <span class="vr">supabase</span>
+  <span class="pu">.</span><span class="fn">from</span><span class="pu">(</span><span class="str">'posts'</span><span class="pu">)</span>
+  <span class="pu">.</span><span class="fn">update</span><span class="pu">({</span> <span class="vr">title</span><span class="pu">:</span> <span class="str">'Updated title'</span> <span class="pu">})</span>
+  <span class="pu">.</span><span class="fn">eq</span><span class="pu">(</span><span class="str">'id'</span><span class="pu">,</span> <span class="nm">5</span><span class="pu">)</span>
+
+<span class="cm">// DELETE — remove a row</span>
+<span class="kw">await</span> <span class="vr">supabase</span>
+  <span class="pu">.</span><span class="fn">from</span><span class="pu">(</span><span class="str">'posts'</span><span class="pu">)</span>
+  <span class="pu">.</span><span class="fn">delete</span><span class="pu">()</span>
+  <span class="pu">.</span><span class="fn">eq</span><span class="pu">(</span><span class="str">'id'</span><span class="pu">,</span> <span class="nm">5</span><span class="pu">)</span></pre>
+  </div>
+
+  <div class="demo-wrap">
+    <div class="demo-bar"><span class="demo-label">Simulated database — insert &amp; select</span><span class="demo-live">● interactive</span></div>
+    <div class="demo-body">
+      <div class="d-row d-gap">
+        <input class="d-input" id="db-input" placeholder="Post title..." style="flex:1" onkeydown="if(event.key==='Enter')dbInsert()">
+        <button class="d-btn primary" onclick="dbInsert()">INSERT</button>
+        <button class="d-btn" onclick="dbSelect()">SELECT *</button>
+        <button class="d-btn danger" onclick="dbClear()">CLEAR</button>
+      </div>
+      <div id="db-table" style="border:1px solid var(--rule2);border-radius:4px;overflow:hidden;margin-bottom:8px;display:none">
+        <div style="display:grid;grid-template-columns:40px 1fr 100px 60px;background:var(--surface);border-bottom:1px solid var(--rule2);padding:6px 12px;font-family:var(--mono);font-size:10px;color:var(--ink4);text-transform:uppercase;letter-spacing:.06em;gap:8px">
+          <span>id</span><span>title</span><span>created_at</span><span></span>
+        </div>
+        <div id="db-rows"></div>
+      </div>
+      <div class="d-output" id="db-out" style="display:none"></div>
+    </div>
+  </div>
+</section>
+
+
+<!-- =====================================================
+     CHAPTER 5 — VIBE CODING
+===================================================== -->
+<div class="chapter-divider" id="ch-vibe">
+  <div class="chapter-number">Chapter 05</div>
+  <h2 class="chapter-title">Vibe Coding with Cursor</h2>
+  <p class="chapter-intro">
+    Cursor is a code editor with AI built in. The real skill isn't knowing every API — it's knowing how to describe what you want clearly enough that AI can help you build it.
+  </p>
+</div>
+
+<section class="section" id="vibe-what">
+  <h3 class="section-title">What is Cursor? <span class="section-badge tag-vibe">AI</span></h3>
+
+  <div style="display:grid;gap:10px;margin:14px 0">
+    <div style="display:flex;gap:14px;padding:14px;border:1px solid var(--rule2);border-radius:5px">
+      <div style="font-size:20px;line-height:1">⌘</div>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:3px">Chat — Cmd+L (Mac) / Ctrl+L (Win)</div>
+        <div style="font-size:13px;color:var(--ink2);line-height:1.6">Open a chat sidebar. Ask questions, request code, paste errors. Cursor reads your whole project.</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:14px;padding:14px;border:1px solid var(--rule2);border-radius:5px">
+      <div style="font-size:20px;line-height:1">✏️</div>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:3px">Inline edit — Cmd+K (Mac) / Ctrl+K (Win)</div>
+        <div style="font-size:13px;color:var(--ink2);line-height:1.6">Select code, press Cmd+K, describe the change. Cursor rewrites just that selection.</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:14px;padding:14px;border:1px solid var(--rule2);border-radius:5px">
+      <div style="font-size:20px;line-height:1">🐛</div>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--ink);margin-bottom:3px">Debug — paste your error</div>
+        <div style="font-size:13px;color:var(--ink2);line-height:1.6">Copy the exact error from your terminal or browser. Paste it in chat. Cursor finds the bug.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="steps" style="margin-top:18px">
+    <div class="step"><div class="step-n">1</div><div class="step-body">Download at <strong>cursor.com</strong> — free tier available</div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-body">Open your Next.js project folder in Cursor</div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-body">Press <code>Cmd+L</code> to open chat — start asking</div></div>
+  </div>
+</section>
+
+<section class="section" id="vibe-prompts">
+  <h3 class="section-title">Prompt formula <span class="section-badge tag-vibe">AI</span></h3>
+  <p class="body-text">Every good prompt has the same 5 parts. Skip one and the output quality drops noticeably.</p>
+
+  <div style="display:grid;gap:8px;margin:14px 0">
+    <div style="display:flex;gap:12px;padding:11px 14px;background:var(--surface);border:1px solid var(--rule2);border-radius:4px;align-items:flex-start">
+      <span style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--accent);background:var(--accent-bg);padding:2px 7px;border-radius:3px;min-width:20px;text-align:center;margin-top:1px">1</span>
+      <div><span style="font-weight:600;font-size:13px;color:var(--ink)">Stack: </span><span style="font-size:13px;color:var(--ink2)">"I'm using Next.js 14 App Router with TypeScript"</span></div>
+    </div>
+    <div style="display:flex;gap:12px;padding:11px 14px;background:var(--surface);border:1px solid var(--rule2);border-radius:4px;align-items:flex-start">
+      <span style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--accent);background:var(--accent-bg);padding:2px 7px;border-radius:3px;min-width:20px;text-align:center;margin-top:1px">2</span>
+      <div><span style="font-weight:600;font-size:13px;color:var(--ink)">File: </span><span style="font-size:13px;color:var(--ink2)">"In app/posts/page.tsx"</span></div>
+    </div>
+    <div style="display:flex;gap:12px;padding:11px 14px;background:var(--surface);border:1px solid var(--rule2);border-radius:4px;align-items:flex-start">
+      <span style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--accent);background:var(--accent-bg);padding:2px 7px;border-radius:3px;min-width:20px;text-align:center;margin-top:1px">3</span>
+      <div><span style="font-weight:600;font-size:13px;color:var(--ink)">What exists: </span><span style="font-size:13px;color:var(--ink2)">"I have a list of posts rendered with .map()"</span></div>
+    </div>
+    <div style="display:flex;gap:12px;padding:11px 14px;background:var(--surface);border:1px solid var(--rule2);border-radius:4px;align-items:flex-start">
+      <span style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--accent);background:var(--accent-bg);padding:2px 7px;border-radius:3px;min-width:20px;text-align:center;margin-top:1px">4</span>
+      <div><span style="font-weight:600;font-size:13px;color:var(--ink)">Goal: </span><span style="font-size:13px;color:var(--ink2)">"Add a delete button that calls DELETE /api/posts/[id]"</span></div>
+    </div>
+    <div style="display:flex;gap:12px;padding:11px 14px;background:var(--surface);border:1px solid var(--rule2);border-radius:4px;align-items:flex-start">
+      <span style="font-family:var(--mono);font-size:10px;font-weight:700;color:var(--accent);background:var(--accent-bg);padding:2px 7px;border-radius:3px;min-width:20px;text-align:center;margin-top:1px">5</span>
+      <div><span style="font-weight:600;font-size:13px;color:var(--ink)">Edge cases: </span><span style="font-size:13px;color:var(--ink2)">"Show loading spinner while deleting, remove from list on success"</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="vibe-examples">
+  <h3 class="section-title">Good vs bad prompts <span class="section-badge tag-vibe">AI</span></h3>
+
+  <div class="prompt-pair">
+    <div class="prompt-box prompt-bad">
+      <h4>❌ Bad</h4>
+      <p>add a button that gets data</p>
+    </div>
+    <div class="prompt-box prompt-good">
+      <h4>✓ Good</h4>
+      <p>Next.js 14 App Router, TypeScript.
+In app/page.tsx (Client Component), add a "Load Posts" button.
+On click: fetch GET /api/posts, store result in useState, render as a &lt;ul&gt; list.
+Show "Loading..." while fetching.</p>
+    </div>
+  </div>
+
+  <div class="prompt-pair">
+    <div class="prompt-box prompt-bad">
+      <h4>❌ Bad</h4>
+      <p>my app is broken fix it</p>
+    </div>
+    <div class="prompt-box prompt-good">
+      <h4>✓ Good</h4>
+      <p>Next.js 14, TypeScript.
+Error: "Cannot read properties of undefined (reading 'map')"
+Line 14 in app/page.tsx.
+Here's the component: [paste code]
+API /api/posts returns: [paste JSON]</p>
+    </div>
+  </div>
+
+  <div class="prompt-pair">
+    <div class="prompt-box prompt-bad">
+      <h4>❌ Bad</h4>
+      <p>make a form</p>
+    </div>
+    <div class="prompt-box prompt-good">
+      <h4>✓ Good</h4>
+      <p>Next.js 14, TypeScript, CSS Modules.
+Create components/CreatePostForm.tsx.
+Fields: title (required), content (textarea).
+On submit: call createPost() Server Action.
+States: idle → loading ("Saving...") → success ("Saved!").</p>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="vibe-workflow">
+  <h3 class="section-title">Workflow <span class="section-badge tag-vibe">AI</span></h3>
+
+  <div class="steps">
+    <div class="step"><div class="step-n">1</div><div class="step-body"><strong>Plan first.</strong> Write what you want in plain English. Break it into small pieces — one component at a time.</div></div>
+    <div class="step"><div class="step-n">2</div><div class="step-body"><strong>Set context once.</strong> Tell Cursor your stack at the start of a conversation. It applies to everything after.</div></div>
+    <div class="step"><div class="step-n">3</div><div class="step-body"><strong>Build one thing.</strong> One component per prompt. Review + test before the next one.</div></div>
+    <div class="step"><div class="step-n">4</div><div class="step-body"><strong>Iterate, don't restart.</strong> "It works but the date format is wrong" — keep the same chat thread.</div></div>
+    <div class="step"><div class="step-n">5</div><div class="step-body"><strong>Ask to explain.</strong> "What does line 12 do?" — never ship code you don't understand.</div></div>
+  </div>
+
+  <div class="callout callout-tip">
+    <strong>Golden rule</strong>
+    AI is a fast coder but a bad decision-maker. You decide what to build. AI writes the code. Always read the output before using it.
+  </div>
+
+  <div class="callout callout-info">
+    <strong>Quick reference — Cursor shortcuts</strong>
+    <code>Cmd+L</code> Chat sidebar &nbsp;·&nbsp;
+    <code>Cmd+K</code> Inline edit &nbsp;·&nbsp;
+    <code>Cmd+I</code> Composer (multi-file edits) &nbsp;·&nbsp;
+    <code>Tab</code> Accept autocomplete
+  </div>
+</section>
+
+<!-- end content -->
+</div><!-- .content-inner -->
+</main>
+
+</div><!-- .layout -->
+
+<script>
+/* =====================================================
+   SIDEBAR — active link & search
+===================================================== */
+function setActive() {
+  const hash = location.hash || '#intro'
+  document.querySelectorAll('.nav-item').forEach(el => {
+    el.classList.toggle('active', el.getAttribute('href') === hash)
+  })
+}
+window.addEventListener('hashchange', setActive)
+document.addEventListener('DOMContentLoaded', setActive)
+
+// Intersection-based active tracking
+const sections = document.querySelectorAll('section[id], .chapter-divider[id]')
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const id = '#' + e.target.id
+      document.querySelectorAll('.nav-item').forEach(el => {
+        el.classList.toggle('active', el.getAttribute('href') === id)
+      })
+    }
+  })
+}, { rootMargin: '0px 0px -60% 0px', threshold: 0 })
+sections.forEach(s => obs.observe(s))
+
+function filterNav(q) {
+  const lq = q.toLowerCase()
+  document.querySelectorAll('.nav-item').forEach(el => {
+    el.style.display = el.textContent.toLowerCase().includes(lq) ? '' : 'none'
+  })
+  document.querySelectorAll('.nav-chapter-label').forEach(el => {
+    const group = el.parentElement
+    const anyVisible = [...group.querySelectorAll('.nav-item')].some(i => i.style.display !== 'none')
+    group.style.display = anyVisible ? '' : 'none'
+  })
+}
+
+/* =====================================================
+   COPY CODE
+===================================================== */
+function copyCode(btn) {
+  const pre = btn.closest('.code-wrap').querySelector('pre')
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    btn.textContent = 'copied!'
+    setTimeout(() => btn.textContent = 'copy', 1500)
+  })
+}
+
+/* =====================================================
+   DEMO: map & filter
+===================================================== */
+function runMap() {
+  const v = document.getElementById('map-input').value
+  const arr = v.split(',').map(s => s.trim()).filter(Boolean)
+  document.getElementById('map-out').textContent    = arr.length ? JSON.stringify(arr.map(x => x.toUpperCase())) : '—'
+  document.getElementById('filter-out').textContent = arr.length ? JSON.stringify(arr.filter(x => x.length > 4)) : '—'
+}
+
+/* =====================================================
+   DEMO: fetch simulation
+===================================================== */
+function simFetch(success) {
+  const out = document.getElementById('fetch-out')
+  out.textContent = '⏳  Sending request...'
+  out.style.color = '#f9e2af'
+  setTimeout(() => {
+    if (success) {
+      out.style.color = '#a6e3a1'
+      out.textContent = '✓  200 OK\n\n' + JSON.stringify([
+        { id: 1, title: 'Hello World', likes: 42 },
+        { id: 2, title: 'Learning Next.js', likes: 18 },
+      ], null, 2)
+    } else {
+      out.style.color = '#f38ba8'
+      out.textContent = '✗  TypeError: Failed to fetch\n\nCaught by try/catch:\n"Failed to load" shown to user.'
+    }
+  }, 700)
+}
+
+/* =====================================================
+   DEMO: counter
+===================================================== */
+let ctrVal = 0
+function ctr(n) {
+  ctrVal += n
+  document.getElementById('ctr-display').textContent = ctrVal
+}
+function ctrReset() { ctrVal = 0; document.getElementById('ctr-display').textContent = 0 }
+
+/* =====================================================
+   DEMO: toggle
+===================================================== */
+let toggled = false
+function doToggle() {
+  toggled = !toggled
+  document.getElementById('toggle-btn').style.background  = toggled ? '#22c55e' : '#d1d5db'
+  document.getElementById('toggle-knob').style.left        = toggled ? '28px' : '4px'
+  document.getElementById('toggle-state').textContent      = `isOn = ${toggled}`
+}
+
+/* =====================================================
+   DEMO: form
+===================================================== */
+function updateForm() {
+  const name  = document.getElementById('form-name').value
+  const email = document.getElementById('form-email').value
+  document.getElementById('form-out').textContent = JSON.stringify({ name, email }, null, 2)
+}
+
+/* =====================================================
+   DEMO: todo list
+===================================================== */
+let todos = ['Buy groceries', 'Finish homework']
+function renderTodos() {
+  const el = document.getElementById('todo-list')
+  if (!todos.length) { el.innerHTML = '<p style="font-size:13px;color:var(--ink4);font-style:italic;padding:4px 0">No tasks. Add one above!</p>'; return }
+  el.innerHTML = todos.map((t, i) => `
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 12px;background:var(--surface);border:1px solid var(--rule2);border-radius:4px;font-size:13px;color:var(--ink)">
+      <span>${t}</span>
+      <button class="d-btn danger" onclick="removeTodo(${i})" style="padding:3px 9px;font-size:11px">✕ Remove</button>
+    </div>`).join('')
+}
+function addTodo() {
+  const input = document.getElementById('todo-input')
+  if (!input.value.trim()) return
+  todos.push(input.value.trim())
+  input.value = ''
+  renderTodos()
+}
+function removeTodo(i) {
+  todos.splice(i, 1)
+  renderTodos()
+}
+renderTodos()
+
+/* =====================================================
+   DEMO: API simulator
+===================================================== */
+function simAPI(method) {
+  const out = document.getElementById('api-out')
+  out.style.color = '#f9e2af'
+  out.textContent = '⏳  Sending request...'
+  const responses = {
+    GET:    '→ GET /api/posts\n← 200 OK\n\n[\n  { "id": 1, "title": "Hello World" },\n  { "id": 2, "title": "Learning Next.js" }\n]',
+    POST:   '→ POST /api/posts\n   body: { "title": "New Post!" }\n← 200 OK\n\n{ "success": true }',
+    DELETE: '→ DELETE /api/posts/1\n← 200 OK\n\n{ "deleted": true, "id": 1 }',
+  }
+  setTimeout(() => {
+    out.style.color = '#a6e3a1'
+    out.textContent = responses[method]
+  }, 600)
+}
+
+/* =====================================================
+   DEMO: DB simulator
+===================================================== */
+let dbRows = []
+let dbId = 1
+
+function dbInsert() {
+  const input = document.getElementById('db-input')
+  if (!input.value.trim()) return
+  const row = { id: dbId++, title: input.value.trim(), created_at: new Date().toLocaleTimeString() }
+  dbRows.push(row)
+  input.value = ''
+  renderDb()
+  const out = document.getElementById('db-out')
+  out.style.display = 'block'
+  out.style.color = '#a6e3a1'
+  out.textContent = `supabase.from("posts").insert({ title: "${row.title}" })\n← inserted row { id: ${row.id} }`
+}
+
+function dbSelect() {
+  renderDb()
+  const out = document.getElementById('db-out')
+  out.style.display = 'block'
+  out.style.color = '#a6e3a1'
+  out.textContent = `supabase.from("posts").select("*")\n← ${dbRows.length} rows returned`
+}
+
+function dbClear() {
+  dbRows = []
+  document.getElementById('db-rows').innerHTML = ''
+  document.getElementById('db-table').style.display = 'none'
+  const out = document.getElementById('db-out')
+  out.style.display = 'none'
+}
+
+function dbDeleteRow(id) {
+  dbRows = dbRows.filter(r => r.id !== id)
+  renderDb()
+  const out = document.getElementById('db-out')
+  out.style.color = '#f38ba8'
+  out.textContent = `supabase.from("posts").delete().eq("id", ${id})\n← row deleted`
+}
+
+function renderDb() {
+  const table = document.getElementById('db-table')
+  const rowsEl = document.getElementById('db-rows')
+  if (!dbRows.length) { table.style.display = 'none'; return }
+  table.style.display = 'block'
+  rowsEl.innerHTML = dbRows.map(r => `
+    <div style="display:grid;grid-template-columns:40px 1fr 100px 60px;padding:7px 12px;border-bottom:1px solid var(--rule);font-family:var(--mono);font-size:12px;color:var(--ink2);align-items:center;gap:8px">
+      <span style="color:var(--ink4)">${r.id}</span>
+      <span style="color:var(--ink)">${r.title}</span>
+      <span style="color:var(--ink4);font-size:10px">${r.created_at}</span>
+      <button class="d-btn danger" onclick="dbDeleteRow(${r.id})" style="padding:2px 7px;font-size:10px">del</button>
+    </div>`).join('')
+}
+</script>
+
+</body>
+</html>
